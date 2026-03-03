@@ -1,51 +1,46 @@
-🚛 Transporter Assignment Optimization System
+# 🚛 Transporter Assignment Optimization System
 
 A Spring Boot application that optimizes transporter assignments to lanes across India based on:
 
-✅ Cost Minimization
+- ✅ Cost Minimization  
+- ✅ Maximum Transporter Utilization (up to a limit)  
+- ✅ Full Lane Coverage  
 
-✅ Maximum Transporter Utilization (up to a limit)
+---
 
-✅ Full Lane Coverage
-
-📌 Problem Statement
+## 📌 Problem Statement
 
 Given:
 
-A list of lanes (origin → destination)
-
-A list of transporters with quoted prices per lane
-
-A maximum number of transporters allowed
+- A list of lanes (origin → destination)  
+- A list of transporters with quoted prices per lane  
+- A maximum number of transporters allowed  
 
 The system must:
 
-Minimize total transportation cost
+1. Minimize total transportation cost  
+2. Maximize transporter usage (up to the specified limit)  
+3. Ensure every lane is assigned to at least one transporter  
 
-Maximize transporter usage (up to the specified limit)
+---
 
-Ensure every lane is assigned to at least one transporter
+## 🛠 Tech Stack
 
-🛠 Tech Stack
+- Java 17  
+- Spring Boot 3.5.11  
+- Spring Data JPA (Hibernate)  
+- PostgreSQL  
+- Maven  
+- JUnit 5 (Unit Testing)  
+- Swagger / OpenAPI  
 
-Java 17
+---
 
-Spring Boot 3.5.11
-
-Spring Data JPA (Hibernate)
-
-PostgreSQL
-
-Maven
-
-JUnit 5 (Unit Testing)
-
-Swagger / OpenAPI
-
-🏗 Architecture
+## 🏗 Architecture
 
 Layered clean structure:
 
+```
 controller
 service
 repository
@@ -54,24 +49,28 @@ dto
 algorithm
 exception
 config
+```
 
-Controller → Handles API requests
+**Responsibilities:**
 
-Service → Business logic
+- Controller → Handles API requests  
+- Service → Business logic  
+- Repository → Database interaction  
+- Algorithm → Optimization engine  
+- DTO → Request/Response objects  
 
-Repository → DB interaction
+---
 
-Algorithm → Optimization engine
+## 🚀 APIs
 
-DTO → Request/Response objects
+### 1️⃣ Submit Input Data
 
-🚀 APIs
-1️⃣ Submit Input Data
+**POST**  
+`/api/v1/transporters/input`
 
-POST
-/api/v1/transporters/input
+#### Request Body
 
-Request Body
+```json
 {
   "lanes": [
     { "id": 1, "origin": "Mumbai", "destination": "Delhi" }
@@ -86,21 +85,35 @@ Request Body
     }
   ]
 }
-Response
+```
+
+#### Response
+
+```json
 {
   "status": "success",
   "message": "Input data saved successfully."
 }
-2️⃣ Get Optimized Assignment
+```
 
-POST
-/api/v1/transporters/assignment
+---
 
-Request Body
+### 2️⃣ Get Optimized Assignment
+
+**POST**  
+`/api/v1/transporters/assignment`
+
+#### Request Body
+
+```json
 {
   "maxTransporters": 3
 }
-Response Example
+```
+
+#### Response Example
+
+```json
 {
   "status": "success",
   "totalCost": 60139,
@@ -109,109 +122,142 @@ Response Example
   ],
   "selectedTransporters": [1, 4, 5]
 }
-🧠 Algorithm Approach
+```
+
+---
+
+## 🧠 Algorithm Approach
 
 The optimizer:
 
-Generates all transporter combinations up to maxTransporters
+1. Generates all transporter combinations up to `maxTransporters`
+2. For each combination:
+   - Validates full lane coverage
+   - Selects minimum quote per lane
+   - Computes total cost
+3. Chooses the best combination based on:
+   - Lowest total cost  
+   - If tie → Maximum transporter usage  
 
-For each combination:
+This ensures:
 
-Validates full lane coverage
+- ✔ Global cost minimization  
+- ✔ Constraint satisfaction  
+- ✔ Deterministic tie-breaking  
 
-Selects minimum quote per lane
+Time complexity is acceptable for moderate assignment-scale inputs.
 
-Computes total cost
+---
 
-Chooses the best combination based on:
+## 🧪 Unit Testing
 
-Lowest total cost
-
-If tie → maximum transporter usage
-
-Time complexity is acceptable for moderate input sizes and aligns with assignment scope.
-
-🧪 Unit Testing
-
-Implemented using JUnit 5.
+Implemented using **JUnit 5**.
 
 Tests cover:
 
-Cost minimization correctness
+- Cost minimization correctness  
+- Tie-break logic (maximize transporter usage)  
+- Failure case when coverage not possible  
 
-Tie-break logic (maximize transporter usage)
+### Run Tests
 
-Failure case when coverage not possible
-
-Run tests:
-
+```bash
 ./mvnw test
+```
 
 All tests passing ✔
 
-🗄 Database Configuration
+---
+
+## 🗄 Database Configuration
 
 Configured for PostgreSQL:
 
+```yaml
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/freightfox
     username: postgres
     password: postgres
+```
 
-Tables are auto-created using JPA (ddl-auto: update).
+Tables are auto-created using:
 
-▶ Running the Application
-1️⃣ Start PostgreSQL
+```
+spring.jpa.hibernate.ddl-auto=update
+```
 
-Ensure database exists:
+---
 
+## ▶ Running the Application
+
+### 1️⃣ Create Database
+
+```sql
 CREATE DATABASE freightfox;
-2️⃣ Run Application
+```
+
+### 2️⃣ Run Application
+
+```bash
 ./mvnw spring-boot:run
-3️⃣ Open Swagger
+```
+
+### 3️⃣ Open Swagger UI
+
+```
 http://localhost:8080/swagger-ui.html
-🧹 Edge Case Handling
+```
 
-The system handles:
+---
 
-No lanes available
+## 🧹 Edge Case Handling
 
-No transporters available
+The system safely handles:
 
-maxTransporters <= 0
+- No lanes available  
+- No transporters available  
+- `maxTransporters <= 0`  
+- Impossible coverage scenarios  
 
-Impossible coverage scenario
+Example failure response:
 
-Returns structured failure response:
-
+```json
 {
   "status": "failed",
   "totalCost": 0,
   "assignments": [],
   "selectedTransporters": []
 }
-📂 Submission Notes
+```
 
-Clean layered architecture
+---
 
-Unit tested algorithm
+## 📂 Submission Highlights
 
-Proper validation and error handling
+- Clean layered architecture  
+- Well-structured DTO design  
+- Combination-based optimization engine  
+- Deterministic tie-break logic  
+- Proper validation and exception handling  
+- Fully unit-tested algorithm  
+- Swagger API documentation  
 
-Swagger documentation enabled
+---
 
-Production-ready structure for 0–2 YOE role
+## ✅ Assignment Objectives Covered
 
-✅ Assignment Objectives Covered
+| Requirement | Status |
+|------------|--------|
+| Cost Minimization | ✔ |
+| Maximize Transporter Usage | ✔ |
+| Full Lane Coverage | ✔ |
+| Input API | ✔ |
+| Result API | ✔ |
+| Unit Tests | ✔ |
 
-Requirement	Status
-Cost Minimization	✔
-Maximize Transporter Usage	✔
-Full Lane Coverage	✔
-Input API	✔
-Result API	✔
-Unit Tests	✔
-🎯 Final Status
+---
 
-Project is fully functional, tested, and submission-ready.
+## 🎯 Final Status
+
+The project is fully functional, tested, and submission-ready.
